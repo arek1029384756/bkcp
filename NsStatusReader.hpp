@@ -1,9 +1,12 @@
 #ifndef NS_STATUS_READER
 #define NS_STATUS_READER
 
+#include <set>
 #include "StatusReader.hpp"
 
 namespace status_reader {
+
+    const std::set<std::string> marks = {"M ", "A "};
 
     class NsStatusReader : public StatusReader {
 
@@ -11,18 +14,19 @@ namespace status_reader {
             std::string pfx("");
             m_files.clear();
 
-            for(auto x : lines) {
-                std::size_t pos = x.find(":");
+            for(auto line : lines) {
+                std::size_t pos = line.find(":");
                 if(pos != std::string::npos) {
-                    pfx = x.substr(0, pos);
+                    pfx = line.substr(0, pos);
                     continue;
                 }
 
-                pos = x.find("M ");
-                if(pos != std::string::npos) {
-                    std::string s = x.substr(pos + 2, x.length() - pos - 2);
-                    m_files.emplace_back(pfx + "/" + s);
-                    continue;
+                for(const auto& mark : marks) {
+                    pos = line.find(mark);
+                    if(pos != std::string::npos) {
+                        std::string s = line.substr(pos + 2, line.length() - pos - 2);
+                        m_files.emplace_back(pfx + "/" + s);
+                    }
                 }
             }
 
