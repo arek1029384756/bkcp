@@ -8,7 +8,8 @@ namespace {
         char** m_argv;
 
         void showUsage() {
-            std::cout << "BacKup CoPy - local safety copy utility, (C) A.Antoniak" << std::endl;
+            std::cout << "BacKup CoPy ver " << getVersion() << std::endl;
+            std::cout << "Local safety copy utility, (C) A.Antoniak" << std::endl;
             std::cout << "Usage:" << std::endl;
             std::cout << "    " << m_argv[0] << " COMMAND [DIRECTORY]" << std::endl << std::endl;
             std::cout << "    COMMAND     - { \"nosilo status\", \"git status\" }" << std::endl;
@@ -36,6 +37,11 @@ namespace {
         public:
         App(int argc, char** argv)
             : m_argc(argc), m_argv(argv) {}
+
+        static const std::string& getVersion() {
+            static std::string ver = "1.2";
+            return ver;
+        }
 
         int run() {
             try {

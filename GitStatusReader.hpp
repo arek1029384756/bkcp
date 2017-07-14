@@ -9,7 +9,7 @@ namespace status_reader {
 
     class GitStatusReader : public StatusReader {
 
-        static const std::set<std::string> marks;
+        static const std::set<std::string> m_marks;
 
         std::list<std::string> m_tokens;
 
@@ -22,7 +22,7 @@ namespace status_reader {
         }
 
         void findMarkedVal(const std::string& line) {
-            for(const auto& mark : marks) {
+            for(const auto& mark : m_marks) {
                 std::size_t pos = line.find(mark);
                 if(pos != std::string::npos) {
                     std::string s = line.substr(pos + mark.length(), line.length() - pos - mark.length());
@@ -48,7 +48,7 @@ namespace status_reader {
             return &n;
         }
     };
-    const std::set<std::string> GitStatusReader::marks = {"modified:", "newfile:"};
+    const std::set<std::string> GitStatusReader::m_marks = {"modified:", "newfile:"};
 }
 
 #endif

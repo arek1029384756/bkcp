@@ -9,7 +9,7 @@ namespace status_reader {
 
     class NsStatusReader : public StatusReader {
 
-        static const std::set<std::string> marks;
+        static const std::set<std::string> m_marks;
 
         FileList& parse(const LineList& lines) {
             std::string pfx("");
@@ -22,7 +22,7 @@ namespace status_reader {
                     continue;
                 }
 
-                for(const auto& mark : marks) {
+                for(const auto& mark : m_marks) {
                     pos = line.find(mark);
                     if(pos != std::string::npos) {
                         std::string s = line.substr(pos + 2, line.length() - pos - 2);
@@ -40,7 +40,7 @@ namespace status_reader {
             return &n;
         }
     };
-    const std::set<std::string> NsStatusReader::marks = {"M ", "A "};
+    const std::set<std::string> NsStatusReader::m_marks = {"M ", "A "};
 }
 
 #endif

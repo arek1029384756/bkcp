@@ -32,22 +32,22 @@ namespace status_reader {
         virtual FileList& parse(const LineList& lines) = 0;
 
         public:
-        static const std::string filename;
+        static const std::string m_out_filename;
 
         virtual FileList& getFileList(const std::string& cmd) {
-            std::string command = cmd + std::string(" > ") + StatusReader::filename;
+            std::string command = cmd + std::string(" > ") + StatusReader::m_out_filename;
             std::cout << "Running '" << cmd << "'" << std::endl;
             file_ops::FileOps::execute(command);
 
-            auto l = getStatusNative(StatusReader::filename, cmd);
-            std::string rm_output = std::string("rm -f ") + StatusReader::filename;
+            auto l = getStatusNative(StatusReader::m_out_filename, cmd);
+            std::string rm_output = std::string("rm -f ") + StatusReader::m_out_filename;
             file_ops::FileOps::execute(rm_output);
 
             return parse(l);
         }
 
     };
-    const std::string StatusReader::filename = "status.output";
+    const std::string StatusReader::m_out_filename = "status.output";
 }
 
 #endif
