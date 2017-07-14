@@ -1,5 +1,6 @@
 #include <iostream>
 #include "NsStatusReader.hpp"
+#include "GitStatusReader.hpp"
 
 namespace {
     class App {
@@ -21,15 +22,25 @@ namespace {
             }
         }
 
+        status_reader::StatusReader* checkVersionControl() {
+            checkOptions();
+
+            auto pos = std::string(m_argv[1]).find("silo");
+            if(pos != std::string::npos) {
+                return status_reader::NsStatusReader::getInstance();
+            } else {
+                return status_reader::GitStatusReader::getInstance();
+            }
+        }
+
         public:
         App(int argc, char** argv)
             : m_argc(argc), m_argv(argv) {}
 
         int run() {
             try {
-                checkOptions();
+                auto ns = checkVersionControl();
 
-                auto ns = status_reader::NsStatusReader::getInstance();
                 auto lf = ns->getFileList((m_argc > 1) ? m_argv[1] : "<empty>");
                 if(lf.empty()) {
                     throw std::runtime_error("Nothing to copy");

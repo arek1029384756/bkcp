@@ -6,9 +6,10 @@
 
 namespace status_reader {
 
-    const std::set<std::string> marks = {"M ", "A "};
 
     class NsStatusReader : public StatusReader {
+
+        static const std::set<std::string> marks;
 
         FileList& parse(const LineList& lines) {
             std::string pfx("");
@@ -39,6 +40,7 @@ namespace status_reader {
             return &n;
         }
     };
+    const std::set<std::string> NsStatusReader::marks = {"M ", "A "};
 }
 
 #endif
