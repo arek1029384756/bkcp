@@ -7,7 +7,7 @@ namespace {
         int m_argc;
         char** m_argv;
 
-        void showUsage() {
+        void showUsage() const {
             std::cout << "BacKup CoPy ver " << getVersion() << std::endl;
             std::cout << "Local safety copy utility, (C) A.Antoniak" << std::endl;
             std::cout << "Usage:" << std::endl;
@@ -16,14 +16,14 @@ namespace {
             std::cout << "    DIRECTORY   - destination (leave empty for current directory)" << std::endl;
         }
 
-        void checkOptions() {
+        void checkOptions() const {
             if(m_argc < 2 || std::string(m_argv[1]) == "--help") {
                 showUsage();
                 throw std::runtime_error("");
             }
         }
 
-        status_reader::StatusReader* checkVersionControl() {
+        status_reader::StatusReader* checkVersionControl() const {
             checkOptions();
 
             auto pos = std::string(m_argv[1]).find("silo");
@@ -39,7 +39,7 @@ namespace {
             : m_argc(argc), m_argv(argv) {}
 
         static const std::string& getVersion() {
-            static std::string ver = "1.2";
+            static const std::string ver = "1.2";
             return ver;
         }
 

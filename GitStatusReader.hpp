@@ -11,8 +11,6 @@ namespace status_reader {
 
         static const std::set<std::string> m_marks;
 
-        std::list<std::string> m_tokens;
-
         std::string formatLine(std::string line) {
             line.erase(std::remove_if(line.begin(), 
                         line.end(),
