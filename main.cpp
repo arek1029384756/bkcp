@@ -39,7 +39,7 @@ namespace {
             : m_argc(argc), m_argv(argv) {}
 
         static const std::string& getVersion() {
-            static const std::string ver = "1.2";
+            static const std::string ver = "1.3";
             return ver;
         }
 
