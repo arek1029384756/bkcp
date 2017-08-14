@@ -47,7 +47,7 @@ namespace file_ops {
         }
 
         static void copyFile(const std::string& filename, const std::string& destination) {
-            auto cp_cmd = std::string("cp ") + filename + std::string(" ") + destination;
+            auto cp_cmd = std::string("cp --parents ") + filename + std::string(" ") + destination;
             std::cout << cp_cmd << std::endl;
             execute(cp_cmd);
         }
