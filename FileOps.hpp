@@ -11,6 +11,8 @@
 namespace file_ops {
 
     class FileOps {
+        FileOps() = delete;
+
         static std::string format0(int val, std::size_t digits = 2) {
             auto s = std::to_string(val);
             auto len = s.length();
@@ -28,11 +30,11 @@ namespace file_ops {
             }
         }
 
-        static const std::string makeDir(const std::string& dir) {
+        static const std::string makeDir(const std::string& parentDir) {
             std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
             std::time_t now_c = std::chrono::system_clock::to_time_t(now);
             auto pt = std::localtime(&now_c);
-            auto s = dir + std::string("bkp_") + std::to_string(pt->tm_year + 1900) + std::string("_") + 
+            auto s = parentDir + std::string("/bkp_") + std::to_string(pt->tm_year + 1900) + std::string("_") +
                 format0(pt->tm_mon + 1) + std::string("_") +
                 format0(pt->tm_mday) + std::string("_") +
                 format0(pt->tm_hour) + std::string("_") +
@@ -51,8 +53,13 @@ namespace file_ops {
             std::cout << cp_cmd << std::endl;
             execute(cp_cmd);
         }
+
+        static void reverseCopyFiles(const std::string& destination) {
+            auto cp_cmd = std::string("find . -type f | xargs -I {} cp --parents {} ") + destination;
+            std::cout << cp_cmd << std::endl;
+            execute(cp_cmd);
+        }
     };
 }
 
 #endif
-

@@ -1,11 +1,39 @@
 #include <iostream>
+#include <algorithm>
 #include "NsStatusReader.hpp"
 #include "GitStatusReader.hpp"
 
 namespace {
     class App {
-        int m_argc;
-        char** m_argv;
+        std::vector<std::string> m_argv;
+        static const std::set<std::string> commands;
+
+        static const std::string getAvailableCommands() {
+            return std::accumulate(commands.begin(),
+                    commands.end(),
+                    std::string(""),
+                    [](const std::string& out, const std::string& cmd) {
+                        auto coma = (out == "") ? std::string("") : std::string(", ");
+                        return out + coma + std::string("\"") + cmd + std::string("\"");
+                    });
+        }
+
+        static bool commandAvailable(const std::string& cmd) {
+            auto it = commands.find(cmd);
+            return it != commands.end();
+        }
+
+        void serviceCommand(status_reader::StatusReader* const statusReader) {
+            auto lf = statusReader->getFileList(m_argv.at(1));
+            if(lf.empty()) {
+                throw std::runtime_error("Nothing to copy");
+            }
+
+            auto dest = file_ops::FileOps::makeDir(m_argv.at(2));
+            for(auto x : lf) {
+                file_ops::FileOps::copyFile(x, dest);
+            }
+        }
 
         void showUsage() const {
             std::cout << "BacKup CoPy ver " << getVersion() << std::endl;
@@ -13,59 +41,63 @@ namespace {
             std::cout << "    " << std::endl;
             std::cout << "    1) copy" << std::endl;
             std::cout << "        $ cd PROJECT_DIRECTORY" << std::endl;
-            std::cout << "        $ " << m_argv[0] << " COMMAND [BACKUP_DIRECTORY]" << std::endl;
+            std::cout << "        $ " << m_argv.at(0) << " COMMAND BACKUP_DIRECTORY" << std::endl;
             std::cout << "        " << std::endl;
             std::cout << "    2) reverse copy" << std::endl;
             std::cout << "        $ cd BACKUP_DIRECTORY" << std::endl;
-            std::cout << "        $ find . -type f | xargs -I {} cp --parents {} PROJECT_DIRECTORY" << std::endl;
+            std::cout << "        $ " << m_argv.at(0) << " PROJECT_DIRECTORY" << std::endl;
             std::cout << "        " << std::endl;
             std::cout << "    options:" << std::endl;
-            std::cout << "        COMMAND            - { \"nosilo status\", \"git status\" }" << std::endl;
-            std::cout << "        BACKUP_DIRECTORY   - backup copy destination (leave empty for current directory)" << std::endl;
+            std::cout << "        COMMAND            - { " << getAvailableCommands() << " }" << std::endl;
+            std::cout << "        BACKUP_DIRECTORY   - backup copy destination" << std::endl;
             std::cout << "        PROJECT_DIRECTORY  - working project directory" << std::endl;
         }
 
         void checkOptions() const {
-            if(m_argc < 2 || std::string(m_argv[1]) == "--help") {
+            auto len = m_argv.size();
+            if(len < 2  || len > 3 || m_argv.at(1) == "--help") {
                 showUsage();
                 throw std::runtime_error("");
             }
         }
 
-        status_reader::StatusReader* checkVersionControl() const {
-            checkOptions();
-
-            auto pos = std::string(m_argv[1]).find("silo");
-            if(pos != std::string::npos) {
-                return status_reader::NsStatusReader::getInstance();
-            } else {
-                return status_reader::GitStatusReader::getInstance();
+        status_reader::StatusReader* getStatusReader() const {
+            auto argN1 = m_argv.at(1);
+            if(commandAvailable(argN1)) {
+                auto pos = argN1.find("silo");
+                if(pos != std::string::npos) {
+                    return status_reader::NsStatusReader::getInstance();
+                } else {
+                    return status_reader::GitStatusReader::getInstance();
+                }
             }
+
+            return nullptr;
         }
 
         public:
-        App(int argc, char** argv)
-            : m_argc(argc), m_argv(argv) {}
+        App(int argc, char** argv) {
+            for(int i = 0; i < argc; ++i) {
+                m_argv.emplace_back(argv[i]);
+            }
+        }
 
         static const std::string& getVersion() {
-            static const std::string ver = "1.5";
+            static const std::string ver = "1.6";
             return ver;
         }
 
         int run() {
             try {
-                auto ns = checkVersionControl();
+                checkOptions();
 
-                auto lf = ns->getFileList((m_argc > 1) ? m_argv[1] : "<empty>");
-                if(lf.empty()) {
-                    throw std::runtime_error("Nothing to copy");
+                auto srPtr = getStatusReader();
+                if(srPtr) {
+                    serviceCommand(srPtr);
+                } else {
+                    file_ops::FileOps::reverseCopyFiles(m_argv.at(1));
                 }
-
-                auto dest = file_ops::FileOps::makeDir((m_argc > 2) ? m_argv[2] : "./");
-                for(auto x : lf) {
-                    file_ops::FileOps::copyFile(x, dest);
-                }
-            } catch(const std::runtime_error& e) {
+            } catch(const std::exception& e) {
                 std::cout << e.what() << std::endl;
                 return EXIT_FAILURE;
             } catch(...) {
@@ -76,10 +108,10 @@ namespace {
             return 0;
         }
     };
+    const std::set<std::string> App::commands = { "nosilo status", "git status" };
 }
 
 int main(int argc, char** argv) {
     App a(argc, argv);
     return a.run();
 }
-
