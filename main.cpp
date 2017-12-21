@@ -10,10 +10,19 @@ namespace {
         void showUsage() const {
             std::cout << "BacKup CoPy ver " << getVersion() << std::endl;
             std::cout << "Local safety copy utility, (C) A.Antoniak" << std::endl;
-            std::cout << "Usage:" << std::endl;
-            std::cout << "    " << m_argv[0] << " COMMAND [DIRECTORY]" << std::endl << std::endl;
-            std::cout << "    COMMAND     - { \"nosilo status\", \"git status\" }" << std::endl;
-            std::cout << "    DIRECTORY   - destination (leave empty for current directory)" << std::endl;
+            std::cout << "    " << std::endl;
+            std::cout << "    1) copy" << std::endl;
+            std::cout << "        $ cd PROJECT_DIRECTORY" << std::endl;
+            std::cout << "        $ " << m_argv[0] << " COMMAND [BACKUP_DIRECTORY]" << std::endl;
+            std::cout << "        " << std::endl;
+            std::cout << "    2) reverse copy" << std::endl;
+            std::cout << "        $ cd BACKUP_DIRECTORY" << std::endl;
+            std::cout << "        $ find . -type f | xargs -I {} cp --parents {} PROJECT_DIRECTORY" << std::endl;
+            std::cout << "        " << std::endl;
+            std::cout << "    options:" << std::endl;
+            std::cout << "        COMMAND            - { \"nosilo status\", \"git status\" }" << std::endl;
+            std::cout << "        BACKUP_DIRECTORY   - backup copy destination (leave empty for current directory)" << std::endl;
+            std::cout << "        PROJECT_DIRECTORY  - working project directory" << std::endl;
         }
 
         void checkOptions() const {
@@ -39,7 +48,7 @@ namespace {
             : m_argc(argc), m_argv(argv) {}
 
         static const std::string& getVersion() {
-            static const std::string ver = "1.4";
+            static const std::string ver = "1.5";
             return ver;
         }
 
