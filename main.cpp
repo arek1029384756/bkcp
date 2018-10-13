@@ -1,5 +1,6 @@
 #include <iostream>
-#include <algorithm>
+#include <vector>
+#include <numeric>
 #include "NsStatusReader.hpp"
 #include "GitStatusReader.hpp"
 
